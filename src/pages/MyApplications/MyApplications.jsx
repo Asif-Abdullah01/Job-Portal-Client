@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from '../../hooks/UseAuth';
+import Swal from 'sweetalert2';
 
 const MyApplications = () => {
     const { user } = useAuth();
@@ -13,6 +14,26 @@ const MyApplications = () => {
                 setJobs(data)
             })
     }, [user.email])
+
+    const handleDeleteApplication = (id) => {
+        fetch(`http://localhost:5000/job-applications/${id}`,{
+            method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.deletedCount > 0) {
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Your coffee has been deleted.",
+                    icon: "success"
+                });
+            }
+
+            const remainingData = jobs.filter(job => job._id != id)
+
+            setJobs(remainingData)
+        })
+    }
 
 
     return (
@@ -68,7 +89,7 @@ const MyApplications = () => {
                                     </td>
                                     <td>Purple</td>
                                     <th>
-                                        <button className="btn btn-ghost btn-xs">X</button>
+                                        <button onClick={() => handleDeleteApplication(job._id)} className="btn btn-ghost btn-xs">X</button>
                                     </th>
                                 </tr>
                             )
